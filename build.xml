@@ -1,0 +1,77 @@
+<project name="FinchEduTest" default="compile-and-run" basedir=".">
+    <property name="projectName" value="FinchEduTest" />
+
+    <!-- 
+      Variables for which directories hold
+        src:   source code
+        build: compiled java files
+        lib:   external libraries
+        dist:  distribution, the final standalone product TODO: Maybe this isn't necessary...
+    -->
+    <property name="src.dir" value="src" />
+    <property name="build.dir" value="build" />
+    <property name="lib.dir" value="lib" />
+    <property name="dist.dir" value="dist" />
+
+    <!-- 
+      The name of the class that Java compiles from,
+      running its "main" method at the very beginning 
+    -->
+    <property name="mainclassName" value="Main" />
+
+    <!--
+      The location of the finch jar that we use for our project
+    -->
+    <property name="finch-jar" value="${lib.dir}/finch.jar" />
+
+    <property name="jnaerator-jar" value="${lib.dir}/jnaerator-0.9.5.jar" />
+
+    <path id="classpath">
+        <pathelement path="${finch-jar}" />
+        <pathelement path="${jnaerator-jar}" />
+        <pathelement path="${build.dir}" />
+    </path>
+
+    <!--
+      "depends" defines which targets we need to complete FIRST before running this target
+    -->
+    <target name="compile-and-run" depends="compile, run" />
+
+    <target name="run">
+        <echo> Run stage! </echo>
+        <java classname="Main"
+            classpathref="classpath"
+            dir="${build.dir}"
+            failonerror="true"
+            fork="true">
+            <sysproperty key="java.library.path" path="${lib.dir}" />
+        </java>
+    </target>
+
+    <target name="compile" depends="init">
+        <echo> Compile stage! </echo>
+        <javac srcdir="${src.dir}"
+            destdir="${build.dir}"
+            source="1.8"
+            target="1.8"
+            verbose="true"
+            classpathref="classpath"
+            includeantruntime="false" />
+        <copy todir="${build.dir}">
+            <fileset dir="${src.dir}">
+                <include name="**/*.fxml" />
+                <include name="**/*.css" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="init">
+        <delete dir="${build.dir}" />
+        <mkdir dir="${build.dir}" />
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}" />
+        <delete dir="${dist.dir}" />
+    </target>
+</project>
